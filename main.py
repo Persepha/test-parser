@@ -251,11 +251,25 @@ async def fetch_pages_urls(url: str):
 
 
 def write_data_to_file(data):
-    if not os.path.exists("data"):
-        os.makedirs("data")
+    base_dir = "data"
 
-    with open("data/data.json", "a") as json_file:
-        json.dump(data.model_dump(), json_file, indent=2)
+    if not os.path.exists(base_dir):
+        os.makedirs(base_dir)
+    
+    file_path = os.path.join(base_dir, "data.json")
+
+    if not os.path.exists(file_path) or os.stat(file_path).st_size == 0:
+        json_data = {"ads": []}
+    else:
+        with open(file_path, 'r') as file:
+            json_data = json.load(file)
+    
+    ad_list = AdList(**json_data)
+
+    ad_list.ads.extend(data.ads)
+
+    with open(file_path, 'w') as file:
+        json.dump(ad_list.model_dump(), file, indent=2)
 
 
 def write_image_to_file(data: str, id: str, index: int):
@@ -285,7 +299,6 @@ async def get_gather_data(url: str):
         tasks.append(task)
 
     offer_urls = await asyncio.gather(*tasks)
-    print(offer_urls)
 
     tasks = []
 
