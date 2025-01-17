@@ -254,7 +254,7 @@ def write_data_to_file(data):
     if not os.path.exists("data"):
         os.makedirs("data")
 
-    with open("data/data.json", "w") as json_file:
+    with open("data/data.json", "a") as json_file:
         json.dump(data.model_dump(), json_file, indent=2)
 
 
